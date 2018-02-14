@@ -20,18 +20,24 @@ if TYPE_CHECKING:
 
 from builtins import *  # noqa: F401,F403 # pylint: disable=redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
 from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-name-in-module,redefined-builtin,unused-wildcard-import,useless-suppression,wildcard-import
-from future.standard_library import install_aliases
-install_aliases()
 
 # ---- Imports -----------------------------------------------------------
 
-import logging as _logging
+import django.conf.urls as d_c_urls
+import django.contrib.admin as d_c_admin
 
-from .main import *  # noqa: F401,F403 # pylint: disable=wildcard-import
-from .version import __version__  # noqa: F401
-
-# ---- Constants ---------------------------------------------------------
+# ---- Data --------------------------------------------------------------
 
 __all__ = ()
 
-LOGGER = _logging.getLogger(__name__)
+try:
+    # For Django 1.8
+    emojiwatch_include = d_c_urls.include('emojiwatch.urls', app_name='emojiwatch', namespace='emojiwatch')  # pylint: disable=unexpected-keyword-arg,useless-suppression
+except TypeError:
+    # In Django 1.9+, app_name moved into the module (e.g., emojiwatch.urls.app_name)
+    emojiwatch_include = d_c_urls.include('emojiwatch.urls', namespace='emojiwatch')
+
+urlpatterns = (
+    d_c_urls.url(r'^emojiwatch/', emojiwatch_include),
+    d_c_urls.url(r'^admin/', d_c_admin.site.urls),
+)

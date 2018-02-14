@@ -23,14 +23,17 @@ import codecs
 import inspect
 import os
 
-# ---- Constants ---------------------------------------------------------
+# ---- Data --------------------------------------------------------------
 
 __all__ = ()
 
 _MY_DIR = os.path.dirname(inspect.getframeinfo(inspect.currentframe()).filename)
 
 INSTALL_REQUIRES = (
+    'Django >= 1.8.0',
+    'django-fernet-fields',
     'future',
+    'slacker',
 )
 
 TESTS_REQUIRE = [
@@ -46,7 +49,7 @@ with open(os.path.join(_MY_DIR, 'tests', 'requirements.txt')) as f:
 # ---- Initialization ----------------------------------------------------
 
 _namespace = {
-    '_version_path': os.path.join(_MY_DIR, '_skel', 'version.py'),
+    '_version_path': os.path.join(_MY_DIR, 'emojiwatch', 'version.py'),
 }
 
 if os.path.isfile(_namespace['_version_path']):
@@ -60,20 +63,25 @@ __vers_str__ = _namespace.get('__vers_str__')
 __release__ = _namespace.get('__release__', __vers_str__)
 
 SETUP_ARGS = {
-    'name': u'py_skel',
+    'name': u'django-emojiwatch',
     'version': __vers_str__,
     'author': u'Matt Bogosian',
     'author_email': u'matt@bogosian.net',
-    'url': u'https://_skel.readthedocs.org/en/{}/'.format(__release__),
+    'url': u'https://django-emojiwatch.readthedocs.org/en/{}/'.format(__release__),
     'license': u'MIT License',
-    'description': u'Python Project Skeleton',
+    'description': u'TODO',
     'long_description': README,
 
     # From <https://pypi.python.org/pypi?%3Aaction=list_classifiers>
     'classifiers': (
-        u'Topic :: Software Development :: Libraries :: Python Modules',
+        u'Topic :: Communications :: Chat',
+        u'Topic :: Office/Business :: Groupware',
         u'Development Status :: 3 - Alpha',
-        u'Intended Audience :: Developers',
+        u'Framework :: Django',
+        u'Framework :: Django :: 1.8',
+        u'Framework :: Django :: 1.11',
+        u'Framework :: Django :: 2.0',
+        u'Intended Audience :: System Administrators',
         u'License :: OSI Approved :: MIT License',
         u'Operating System :: OS Independent',
         u'Programming Language :: Python',
@@ -91,12 +99,6 @@ SETUP_ARGS = {
     'setup_requires': ('pytest-runner',),
     'test_suite': 'tests',
     'tests_require': TESTS_REQUIRE,
-
-    'entry_points': {
-        'console_scripts': (
-            '_skel = _skel.main:main',
-        ),
-    },
 }
 
 if __name__ == '__main__':

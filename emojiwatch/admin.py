@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
 # ========================================================================
@@ -24,29 +23,36 @@ from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-n
 
 # ---- Imports -----------------------------------------------------------
 
-import logging
-import unittest
+import django.forms as d_forms
+import django.contrib.admin as d_c_admin
 
-# from tests.symmetries import mock
+from .models import SlackWorkspaceEmojiWatcher
 
-# ---- Constants ---------------------------------------------------------
+# ---- Data --------------------------------------------------------------
 
 __all__ = ()
-
-_LOGGER = logging.getLogger(__name__)
 
 # ---- Classes -----------------------------------------------------------
 
 # ========================================================================
-class MainTestCase(unittest.TestCase):
+class VersionedAdminForm(d_forms.ModelForm):
 
-    # ---- Methods -------------------------------------------------------
+    # ---- Constructor ---------------------------------------------------
 
-    def test_main(self):  # type: (...) -> None
-        pass
+    def __init__(self, *args, **kw):
+        # type: (...) -> None
+        super().__init__(*args, **kw)  # type: ignore # py2
+        # Hack to hide the _version field from the user, but still submit
+        # its value with the form
+        self.fields['_version'].widget = d_c_admin.widgets.AdminTextInputWidget(attrs={'type': 'hidden'})
+
+# ========================================================================
+class VersionedAdmin(d_c_admin.ModelAdmin):
+
+    # ---- Data ----------------------------------------------------------
+
+    form = VersionedAdminForm
 
 # ---- Initialization ----------------------------------------------------
 
-if __name__ == '__main__':
-    import tests  # noqa: F401 # pylint: disable=unused-import
-    unittest.main()
+d_c_admin.site.register(SlackWorkspaceEmojiWatcher, VersionedAdmin)

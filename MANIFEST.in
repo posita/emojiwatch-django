@@ -13,3 +13,5 @@ include \
     CREDITS \
     LICENSE \
     tests/requirements.txt
+
+recursive-include emojiwatch/static *

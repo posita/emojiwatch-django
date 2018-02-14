@@ -24,15 +24,12 @@ from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-n
 
 # ---- Imports -----------------------------------------------------------
 
-import logging
 import re
 import unittest
 
-# ---- Constants ---------------------------------------------------------
+# ---- Data --------------------------------------------------------------
 
 __all__ = ()
-
-_LOGGER = logging.getLogger(__name__)
 
 # ---- Classes -----------------------------------------------------------
 
@@ -76,5 +73,4 @@ class MetaTestCase(unittest.TestCase):
 # ---- Initialization ----------------------------------------------------
 
 if __name__ == '__main__':
-    import tests  # noqa: F401 # pylint: disable=unused-import
     unittest.main()

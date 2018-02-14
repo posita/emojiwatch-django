@@ -28,6 +28,8 @@ from setup import SETUP_ARGS
 # _setup = {}
 # execfile(os.path.join(os.getcwd(), os.path.pardir, 'setup.py'), _setup, _setup)
 # SETUP_ARGS = _setup['SETUP_ARGS']
+import django
+django.setup()
 
 # -- General configuration ------------------------------------------------
 

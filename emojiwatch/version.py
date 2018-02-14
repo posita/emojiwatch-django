@@ -18,7 +18,7 @@ TYPE_CHECKING = False  # from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     import typing  # noqa: F401 # pylint: disable=import-error,unused-import,useless-suppression
 
-# ---- Constants ---------------------------------------------------------
+# ---- Data --------------------------------------------------------------
 
 __all__ = ()
 
