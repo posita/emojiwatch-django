@@ -29,7 +29,10 @@ __all__ = ()
 _MY_DIR = os.path.abspath(os.path.dirname(inspect.stack()[0][1]))
 
 INSTALL_REQUIRES = (
+    'Django >= 1.8.0',
+    'django-fernet-fields',
     'future',
+    'slacker',
 )
 
 TESTS_REQUIRE = [
@@ -45,7 +48,7 @@ with open(os.path.join(_MY_DIR, 'tests', 'requirements.txt')) as f:
 # ---- Initialization --------------------------------------------------
 
 vers_info = {
-    '__path__': os.path.join(_MY_DIR, '_skel', 'version.py'),
+    '__path__': os.path.join(_MY_DIR, 'emojiwatch', 'version.py'),
 }
 
 if os.path.isfile(vers_info['__path__']):
@@ -59,20 +62,25 @@ __vers_str__ = vers_info.get('__vers_str__')
 __release__ = vers_info.get('__release__', __vers_str__)
 
 SETUP_ARGS = {
-    'name': 'py_skel',
+    'name': 'django-emojiwatch',
     'version': __vers_str__,
     'author': 'Matt Bogosian',
     'author_email': 'matt@bogosian.net',
-    'url': 'https://_skel.readthedocs.org/en/{}/'.format(__release__),
+    'url': 'https://django-emojiwatch.readthedocs.org/en/{}/'.format(__release__),
     'license': 'MIT License',
-    'description': 'Python Project Skeleton',
+    'description': 'Bare bones Slack app for posting custom emoji updates to a designated channel',
     'long_description': README,
 
     # From <https://pypi.python.org/pypi?%3Aaction=list_classifiers>
     'classifiers': (
-        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Communications :: Chat',
+        'Topic :: Office/Business :: Groupware',
         'Development Status :: 3 - Alpha',
-        'Intended Audience :: Developers',
+        'Framework :: Django',
+        'Framework :: Django :: 1.8',
+        'Framework :: Django :: 1.11',
+        'Framework :: Django :: 2.0',
+        'Intended Audience :: System Administrators',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
@@ -90,12 +98,6 @@ SETUP_ARGS = {
     'setup_requires': ('pytest-runner',),
     'test_suite': 'tests',
     'tests_require': TESTS_REQUIRE,
-
-    'entry_points': {
-        'console_scripts': (
-            '_skel = _skel.main:main',
-        ),
-    },
 }
 
 if __name__ == '__main__':

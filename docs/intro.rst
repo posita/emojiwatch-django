@@ -18,51 +18,130 @@ If those files are missing or appear to be modified from their originals, then p
 Introduction
 ============
 
-``_skel`` is a project skeleton for Python.
+``django-emojiwatch`` is a bare bones Slack app for posting custom emoji updates to a designated channel.
+It is implemented as a Django app.
+It was loosely inspired by Khan Academy's |emojiwatch|_, which provides similar functionality, but for hosting on on Google App Engine.
+
+.. |emojiwatch| replace:: ``emojiwatch``
+.. _`emojiwatch`: https://github.com/Khan/emojiwatch
 
 License
 -------
 
-``_skel`` is licensed under the `MIT License <https://opensource.org/licenses/MIT>`_.
+``django-emojiwatch`` is licensed under the `MIT License <https://opensource.org/licenses/MIT>`_.
 See the :doc:`LICENSE <LICENSE>` file for details.
-Source code is `available on GitHub <https://github.com/posita/_skel>`__.
+Source code is `available on GitHub <https://github.com/posita/django-emojiwatch>`__.
 
 Installation
 ------------
 
-This project is not meant to be installed as is, but rather cloned and then modified as necessary.
-It is intended that derived projects allow installation via ``pip``.
+Django
+~~~~~~
 
-Installation can be performed via ``pip`` (which will download and install the `latest release <https://pypi.python.org/pypi/_skel/>`__):
-
-.. code-block:: console
-
-   % pip install _skel
-   ...
-
-Alternately, you can download the sources (e.g., `from GitHub <https://github.com/posita/_skel>`__) and run ``setup.py``:
+Installation can be performed via ``pip`` (which will download and install the `latest release <https://pypi.python.org/pypi/django-emojiwatch/>`__):
 
 .. code-block:: console
 
-   % git clone https://github.com/posita/_skel
+   % pip install django-emojiwatch
    ...
-   % cd _skel
+
+Alternately, you can download the sources (e.g., `from GitHub <https://github.com/posita/django-emojiwatch>`__) and run ``setup.py``:
+
+.. code-block:: console
+
+   % git clone https://github.com/posita/django-emojiwatch
+   ...
+   % cd django-emojiwatch
    % python setup.py install
    ...
+
+Now you can add it to your ``DJANGO_SETTINGS_MODULE``:
+
+.. code-block:: python
+
+    INSTALLED_APPS = (
+        # ...
+        'emojiwatch',
+    )
+
+    EMOJIWATCH = {
+        'slack_verification_token': '...',
+    }
+
+And add it to your site-wide URLs:
+
+.. code-block:: python
+
+    from django.conf.urls import include, url
+
+    urlpatterns = (
+        # ...
+        url(
+            r'^emojiwatch/',  # or werever you want
+            include('emojiwatch.urls'),
+        ),
+        # ...
+    )
+
+If you haven't already, you'll also need to `enable the admin site <https://docs.djangoproject.com/en/2.0/ref/contrib/admin/#overview>`__ for your Django installation.
+
+Configuring Token Encryption in Django's Database
++++++++++++++++++++++++++++++++++++++++++++++++++
+
+By default, workspace IDs will be encrypted using a hash of the ``SECRET_KEY`` Django setting.
+To override this, use the ``FERNET_KEYS`` setting. For example:
+
+.. code-block:: python
+
+    from os import environ
+    SECRET_KEY = environ['SECRET_KEY']
+    # Use only Base64-encoded 32 byte values for keys; don't derive them
+    # from arbitrary strings
+    FERNET_USE_HKDF = False
+    # For supporting any legacy keys that were used when FERNET_USE_HKDF
+    # was True
+    from fernet_fields.hkdf import derive_fernet_key
+    # The keys
+    FERNET_KEYS = [
+        # The first entry is the current key (for encrypting and
+        # decrypting)
+        environ['FERNET_KEY'],
+        # Optional additional entries are older keys for decrypting only
+        # environ['OLD_FERNET_KEY_1'],
+        # Equivalent to the default key
+        # derive_fernet_key(SECRET_KEY),
+    ]
+
+See `the docs <http://django-fernet-fields.readthedocs.io/en/latest/#keys>`__ for details.
+
+Slack App Setup
+~~~~~~~~~~~~~~~
+
+For illustration, we'll create a `workspace-based Slack app <https://api.slack.com/docs/token-types#workspace>`__, but we could just as easily use a traditional one.
+
+TODO: Finish this section.
 
 Requirements
 ------------
 
+You'll a Slack account (and admin approval) for setting up your app.
 A modern version of Python is required:
 
-* `cPython <https://www.python.org/>`_ (2.7 or 3.3+)
-* `PyPy <http://pypy.org/>`_ (Python 2.7 or 3.3+ compatible)
+* `cPython <https://www.python.org/>`_ (2.7 or 3.4+)
+* `PyPy <http://pypy.org/>`_ (Python 2.7 or 3.4+ compatible)
 
-Python 2.6 will *not* work.
+``django-emojiwatch`` has the following dependencies (which will be installed automatically):
 
-``_skel`` has the following dependencies (which will be installed automatically):
-
+* |Django|_ (1.8 or higher)
+* |django-fernet-fields|_
 * |future|_
+* |slacker|_
 
+.. |Django| replace:: ``Django``
+.. _`Django`: https://www.djangoproject.com/
+.. |django-fernet-fields| replace:: ``django-fernet-fields``
+.. _`django-fernet-fields`: https://django-fernet-fields.readthedocs.io/
 .. |future| replace:: ``future``
 .. _`future`: http://python-future.org/
+.. |slacker| replace:: ``slacker``
+.. _`slacker`: https://github.com/os/slacker

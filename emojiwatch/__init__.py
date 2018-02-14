@@ -26,7 +26,8 @@ install_aliases()
 
 import logging as _logging
 
-from .main import *  # noqa: F401,F403 # pylint: disable=wildcard-import
+import django.conf as d_conf
+
 from .version import __version__  # noqa: F401
 
 # ---- Data ------------------------------------------------------------
@@ -34,3 +35,11 @@ from .version import __version__  # noqa: F401
 __all__ = ()
 
 LOGGER = _logging.getLogger(__name__)
+
+SETTINGS = getattr(d_conf.settings, 'EMOJIWATCH', {})
+
+try:
+    SLACK_VERIFICATION_TOKEN = SETTINGS['slack_verification_token']
+except (KeyError, TypeError):
+    SLACK_VERIFICATION_TOKEN = 'xoxa-NOT-A-REAL-TOKEN'
+    LOGGER.warning("EMOJIWATCH['slack_verification_token'] setting is missing (using '%s')", SLACK_VERIFICATION_TOKEN)

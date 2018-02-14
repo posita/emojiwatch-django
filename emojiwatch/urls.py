@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 # ======================================================================
 """
@@ -23,30 +22,23 @@ from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-n
 
 # ---- Imports ---------------------------------------------------------
 
-import logging
-import unittest
+import django.conf.urls as d_c_urls
 
-# from tests.symmetries import mock
+from .views import (
+    CsrfExemptRedirectView,
+    event_hook_handler,
+)
 
 # ---- Data ------------------------------------------------------------
 
 __all__ = ()
 
-_LOGGER = logging.getLogger(__name__)
+app_name = 'emojiwatch'
 
-# ---- Classes ---------------------------------------------------------
-
-# ======================================================================
-class MainTestCase(unittest.TestCase):
-
-    # ---- Methods -----------------------------------------------------
-
-    def test_main(self):
-        # type: (...) -> None
-        pass
-
-# ---- Initialization --------------------------------------------------
-
-if __name__ == '__main__':
-    import tests  # noqa: F401 # pylint: disable=unused-import
-    unittest.main()
+urlpatterns = (
+    d_c_urls.url(r'event_hook$', event_hook_handler, name='event_hook'),
+    d_c_urls.url(r'', CsrfExemptRedirectView.as_view(
+        permanent=True,
+        url='https://github.com/posita/django-emojiwatch',
+    )),
+)

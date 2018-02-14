@@ -22,14 +22,43 @@ from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-n
 
 # ---- Imports ---------------------------------------------------------
 
+import os
 import six
 import unittest
-
-from _skel.main import configlogging
 
 # ---- Data ------------------------------------------------------------
 
 __all__ = ()
+
+# ---- Functions -------------------------------------------------------
+
+# ======================================================================
+def setup():
+    # type: (...) -> None
+    """
+    Prerequisite to importing any Django models.
+    """
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.django_settings')
+    import django
+    django.setup()
+
+# ======================================================================
+def main():
+    # type: (...) -> None
+    """
+    Wraps :func:`unittest.main` with the necessary Django setup. If your
+    test code also requires importing Django models, call :func:setup
+    before making those imports.
+    """
+    import django.test.utils as d_t_utils
+
+    try:
+        d_t_utils.setup_test_environment()
+        old_config = d_t_utils.setup_databases(verbosity=1, interactive=False)
+        unittest.main()
+    finally:
+        d_t_utils.teardown_databases(old_config, verbosity=1)
+        d_t_utils.teardown_test_environment()
 
 # ---- Initialization --------------------------------------------------
 
@@ -47,5 +76,3 @@ if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
 
 if not hasattr(unittest.TestCase, 'assertRegex'):
     setattr(unittest.TestCase, 'assertRegex', six.assertRegex)
-
-configlogging()

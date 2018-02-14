@@ -20,8 +20,12 @@
 /.tox/
 /build/
 /dist/
+/django-test.db
 /docs/_build/
 /docs/_static/
+/docs/emojiwatch.*.rst
+/docs/emojiwatch.rst
+/docs/modules.rst
 /htmlcov/
 __pycache__/
 flycheck_*.py

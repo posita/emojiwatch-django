@@ -19,6 +19,12 @@ python:
     - "3.6"
     - "pypy3"
 
+env:
+    - DJANGO="1.8-lts"
+    - DJANGO="1.11-lts"
+    - DJANGO="2"
+    - DJANGO="dev"
+
 install:
     - pip install coveralls tox-travis
 
@@ -26,6 +32,21 @@ matrix:
     allow_failures:
         # PyPy3 is experimental
         - python: "pypy3"
+
+        # Django dev is experimental
+        - env: DJANGO="dev"
+
+    exclude:
+        - python: "2.7"
+          env: DJANGO="2"
+        - python: "2.7"
+          env: DJANGO="dev"
+        - python: "pypy"
+          env: DJANGO="2"
+        - python: "pypy"
+          env: DJANGO="dev"
+        - python: "3.4"
+          env: DJANGO="dev"
 
 script:
     - tox

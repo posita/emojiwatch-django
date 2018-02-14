@@ -21,12 +21,12 @@ If those files are missing or appear to be modified from their originals, then p
 .. |CREDITS| replace:: ``CREDITS``
 .. _`CREDITS`: https://_skel.readthedocs.org/en/master/CREDITS.html
 
-.. image:: https://travis-ci.org/posita/_skel.svg?branch=master
-   :target: https://travis-ci.org/posita/_skel?branch=master
+.. image:: https://travis-ci.org/posita/django-emojiwatch.svg?branch=master
+   :target: https://travis-ci.org/posita/django-emojiwatch?branch=master
    :alt: [Build Status]
 
-.. image:: https://coveralls.io/repos/posita/_skel/badge.svg?branch=master
-   :target: https://coveralls.io/r/posita/_skel?branch=master
+.. image:: https://coveralls.io/repos/posita/django-emojiwatch/badge.svg?branch=master
+   :target: https://coveralls.io/r/posita/django-emojiwatch?branch=master
    :alt: [Coverage Status]
 
 Curious about integrating your project with the above services?
@@ -35,50 +35,48 @@ Jeff Knupp (|@jeffknupp|_) `describes how <https://www.jeffknupp.com/blog/2013/0
 .. |@jeffknupp| replace:: **@jeffknupp**
 .. _`@jeffknupp`: https://github.com/jeffknupp
 
-``_skel`` - Python Project Skeleton
-===================================
+``django-emojiwatch``
+=====================
 
-.. image:: https://img.shields.io/pypi/v/_skel.svg
-   :target: https://pypi.python.org/pypi/_skel
+.. image:: https://img.shields.io/pypi/v/django-emojiwatch.svg
+   :target: https://pypi.python.org/pypi/django-emojiwatch
    :alt: [master Version]
 
-.. image:: https://readthedocs.org/projects/_skel/badge/?version=master
-   :target: https://_skel.readthedocs.org/en/master/
+.. image:: https://readthedocs.org/projects/django-emojiwatch/badge/?version=master
+   :target: https://django-emojiwatch.readthedocs.org/en/master/
    :alt: [master Documentation]
 
-.. image:: https://img.shields.io/pypi/l/_skel.svg
+.. image:: https://img.shields.io/pypi/l/django-emojiwatch.svg
    :target: http://opensource.org/licenses/MIT
    :alt: [master License]
 
-.. image:: https://img.shields.io/pypi/pyversions/_skel.svg
-   :target: https://pypi.python.org/pypi/_skel
+.. image:: https://img.shields.io/pypi/pyversions/django-emojiwatch.svg
+   :target: https://pypi.python.org/pypi/django-emojiwatch
    :alt: [master Supported Python Versions]
 
-.. image:: https://img.shields.io/pypi/implementation/_skel.svg
-   :target: https://pypi.python.org/pypi/_skel
+.. image:: https://img.shields.io/pypi/implementation/django-emojiwatch.svg
+   :target: https://pypi.python.org/pypi/django-emojiwatch
    :alt: [master Supported Python Implementations]
 
-.. image:: https://img.shields.io/pypi/status/_skel.svg
-   :target: https://pypi.python.org/pypi/_skel
+.. image:: https://img.shields.io/pypi/status/django-emojiwatch.svg
+   :target: https://pypi.python.org/pypi/django-emojiwatch
    :alt: [master Development Stage]
 
 ..
 
-``_skel`` is a project skeleton for Python.
+``django-emojiwatch`` is a bare bones Slack app for posting custom emoji updates to a designated channel.
 It is licensed under the `MIT License <https://opensource.org/licenses/MIT>`_.
 See the |LICENSE|_ file for details.
-Source code is `available on GitHub <https://github.com/posita/_skel>`__.
-See `the docs <https://_skel.readthedocs.org/en/master/>`__ for more information.
+Source code is `available on GitHub <https://github.com/posita/django-emojiwatch>`__.
+See `the docs <https://django-emojiwatch.readthedocs.org/en/master/>`__ for more information.
 
-Examples
---------
+Use
+---
 
-.. TODO
-
-Coming soon.
+See `the introduction <docs/intro.rst>`__.
 
 Issues
 ------
 
-If you find a bug, or want a feature, please `file an issue <https://github.com/posita/_skel/issues>`__ (if it hasn't already been filed).
-If you're willing and able, consider `contributing <https://_skel.readthedocs.org/en/master/contrib.html>`__.
+If you find a bug, or want a feature, please `file an issue <https://github.com/posita/django-emojiwatch/issues>`__ (if it hasn't already been filed).
+If you're willing and able, consider `contributing <https://django-emojiwatch.readthedocs.org/contrib.html>`__.
