@@ -24,6 +24,11 @@ from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-n
 
 import django.conf.urls as d_c_urls
 
+from .version import (
+    __release__,
+    __version__,
+)
+
 from .views import (
     CsrfExemptRedirectView,
     event_hook_handler,
@@ -33,12 +38,15 @@ from .views import (
 
 __all__ = ()
 
+_RTD_RELEASE = __release__ if __version__ != (0, 0, 0) else 'latest'
+_RTD_URL = 'https://django-emojiwatch.readthedocs.io/en/{}/'.format(_RTD_RELEASE)
+
 app_name = 'emojiwatch'
 
 urlpatterns = (
     d_c_urls.url(r'event_hook$', event_hook_handler, name='event_hook'),
     d_c_urls.url(r'', CsrfExemptRedirectView.as_view(
         permanent=True,
-        url='https://github.com/posita/django-emojiwatch',
+        url=_RTD_URL,
     )),
 )

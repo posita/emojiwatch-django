@@ -112,6 +112,11 @@ class CsrfExemptRedirectView(d_v_generic.RedirectView):
 def event_hook_handler(
         request,  # type: d_http.HttpRequest
 ):  # type: (...) -> d_http.HttpResponse
+    if not SLACK_VERIFICATION_TOKEN:
+        LOGGER.critical("EMOJIWATCH['slack_verification_token'] setting is missing")
+
+        return d_http.HttpResponseServerError()
+
     slack_retry_num = request.META.get('HTTP_X_SLACK_RETRY_NUM', 0)
     slack_retry_reason = request.META.get('HTTP_X_SLACK_RETRY_REASON', None)
 
@@ -120,12 +125,13 @@ def event_hook_handler(
 
     content_type = request.META.get('HTTP_CONTENT_TYPE', 'application/json')
 
-    if content_type != 'application/json':
+    if content_type != 'application/json' \
+            or request.encoding not in {None, 'utf-8', 'UTF-8', 'csUTF8'}:
         return d_http.HttpResponse(status_code=415)
 
     try:
-        payload_data = json.loads(request.body.decode('utf-8'), encoding=request.encoding)  # type: typing.Dict
-    except JSONDecodeError:
+        payload_data = json.loads(request.body.decode('utf-8'))  # type: typing.Dict
+    except (JSONDecodeError, UnicodeDecodeError):
         LOGGER.info('unable to parse JSON from request body')
         truncate_len = 1024
         half_truncate_len = truncate_len >> 1

@@ -44,6 +44,10 @@ DATABASES = {
 
 DEBUG = True
 
+EMOJIWATCH = {
+    'slack_verification_token': 'FoRtEsTiNgOnLyNoTrEaLlYaVeRiFiCaTiOnToKeN',
+}
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
