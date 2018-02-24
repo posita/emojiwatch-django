@@ -45,7 +45,8 @@ DATABASES = {
 DEBUG = True
 
 EMOJIWATCH = {
-    'slack_verification_token': 'FoRtEsTiNgOnLyNoTrEaLlYaVeRiFiCaTiOnToKeN',
+    'slack_auth_token': 'xoxa-for-testing-only-not-a-real-auth-token',
+    'slack_verification_token': 'FoRtEsTiNgOnLyNoTaReAlVeRiFiCaTiOnToKeN',
 }
 
 INSTALLED_APPS = (

@@ -65,6 +65,7 @@ Now you can add it to your ``DJANGO_SETTINGS_MODULE``:
     )
 
     EMOJIWATCH = {
+        'slack_auth_token': '...',
         'slack_verification_token': '...',
     }
 
@@ -88,34 +89,13 @@ If you haven't already, you'll also need to `enable the admin site <https://docs
 Configuring Token Encryption in Django's Database
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
-By default, workspace IDs will be encrypted using a hash of the ``SECRET_KEY`` Django setting.
-To override this, use the ``FERNET_KEYS`` setting. For example:
-
-.. code-block:: python
-
-    from os import environ
-    SECRET_KEY = environ['SECRET_KEY']
-    # Use only Base64-encoded 32 byte values for keys; don't derive them
-    # from arbitrary strings
-    FERNET_USE_HKDF = False
-    # For supporting any legacy keys that were used when FERNET_USE_HKDF
-    # was True
-    from fernet_fields.hkdf import derive_fernet_key
-    # The keys
-    FERNET_KEYS = [
-        # The first entry is the current key (for encrypting and
-        # decrypting)
-        environ['FERNET_KEY'],
-        # Optional additional entries are older keys for decrypting only
-        # environ['OLD_FERNET_KEY_1'],
-        # Equivalent to the default key
-        # derive_fernet_key(SECRET_KEY),
-    ]
-
+Notes associated with a watcher are encrypted in the Django database using |django-fernet-fields|_.
+By default, the encryption key is derived from the ``SECRET_KEY`` Django setting.
+To override this, use the ``FERNET_KEYS`` and ``FERNET_USE_HKDF`` settings.
 See `the docs <http://django-fernet-fields.readthedocs.io/en/latest/#keys>`__ for details.
 
-Slack App Setup
-~~~~~~~~~~~~~~~
+Slack App and Watcher Setup
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For illustration, we'll create a `workspace-based Slack app <https://api.slack.com/docs/token-types#workspace>`__, but we could just as easily use a traditional one.
 

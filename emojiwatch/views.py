@@ -34,8 +34,11 @@ import django.views.decorators.csrf as d_v_d_csrf
 import django.views.decorators.http as d_v_d_http
 import django.views.generic as d_v_generic
 
+from gettext import gettext
+
 from . import (
     LOGGER,
+    SLACK_AUTH_TOKEN,
     SLACK_VERIFICATION_TOKEN,
 )
 from .models import (
@@ -53,7 +56,8 @@ _EMOJI_NAME_MAX_LEN = 255
 _EMOJI_URL_MAX_LEN = 1023
 _EMOJIS_MAX_LEN = 32
 _FIELD_MAX_LEN = 63
-_SHRUG = '\u00af\\_(\u30c4)_/\u00af'
+_SHRUG = str(u'\u00af\\_(\u30c4)_/\u00af')
+_SLACK = slacker.Slacker(SLACK_AUTH_TOKEN)
 _SUB_HANDLERS_BY_SUBTYPE = {}  # type: typing.Dict[typing.Text, typing.Callable[[SlackWorkspaceEmojiWatcher, typing.Dict], slacker.Response]]
 _UNRECOGNIZED_JSON_BODY_ERR = 'unrecognized JSON structure from request body'
 
@@ -71,7 +75,7 @@ class RequestPayloadValidationError(Exception):
 
     def __init__(  # noqa:F811 # pylint: disable=keyword-arg-before-vararg
             self,
-            message=_UNRECOGNIZED_JSON_BODY_ERR,
+            message=gettext(_UNRECOGNIZED_JSON_BODY_ERR),
             response=d_http.HttpResponseBadRequest(),
             *args,
             **kw
@@ -112,6 +116,11 @@ class CsrfExemptRedirectView(d_v_generic.RedirectView):
 def event_hook_handler(
         request,  # type: d_http.HttpRequest
 ):  # type: (...) -> d_http.HttpResponse
+    if not SLACK_AUTH_TOKEN:
+        LOGGER.critical("EMOJIWATCH['slack_auth_token'] setting is missing")
+
+        return d_http.HttpResponseServerError()
+
     if not SLACK_VERIFICATION_TOKEN:
         LOGGER.critical("EMOJIWATCH['slack_verification_token'] setting is missing")
 
@@ -121,7 +130,7 @@ def event_hook_handler(
     slack_retry_reason = request.META.get('HTTP_X_SLACK_RETRY_REASON', None)
 
     if slack_retry_num:
-        LOGGER.info("Slack retry attempt %s ('%s')", slack_retry_num, slack_retry_reason)
+        LOGGER.info(gettext("Slack retry attempt %s ('%s')"), slack_retry_num, slack_retry_reason)
 
     content_type = request.META.get('HTTP_CONTENT_TYPE', 'application/json')
 
@@ -132,7 +141,7 @@ def event_hook_handler(
     try:
         payload_data = json.loads(request.body.decode('utf-8'))  # type: typing.Dict
     except (JSONDecodeError, UnicodeDecodeError):
-        LOGGER.info('unable to parse JSON from request body')
+        LOGGER.info(gettext('unable to parse JSON from request body'))
         truncate_len = 1024
         half_truncate_len = truncate_len >> 1
 
@@ -148,12 +157,12 @@ def event_hook_handler(
             verification_token = payload_data['token']
         except (KeyError, TypeError):
             verification_token = None
-            LOGGER.info(_UNRECOGNIZED_JSON_BODY_ERR + " (missing 'token')")  # pylint: disable=logging-not-lazy
+            LOGGER.info(gettext(_UNRECOGNIZED_JSON_BODY_ERR + " (missing 'token')"))  # pylint: disable=logging-not-lazy
 
         if not verification_token \
                 or verification_token != SLACK_VERIFICATION_TOKEN:
             raise RequestPayloadValidationError(
-                message='bad verification token',
+                message=gettext('bad verification token'),
                 response=d_http.HttpResponseForbidden(),
             )
 
@@ -161,7 +170,7 @@ def event_hook_handler(
             call_type = payload_data['type']
         except KeyError:
             raise RequestPayloadValidationError(
-                message=_UNRECOGNIZED_JSON_BODY_ERR + " (missing 'type')",
+                message=gettext(_UNRECOGNIZED_JSON_BODY_ERR + " (missing 'type')"),
             )
 
         if call_type == 'url_verification':
@@ -169,20 +178,20 @@ def event_hook_handler(
                 challenge = payload_data['challenge']
             except KeyError:
                 raise RequestPayloadValidationError(
-                    message=_UNRECOGNIZED_JSON_BODY_ERR + " (missing 'challenge')",
+                    message=gettext(_UNRECOGNIZED_JSON_BODY_ERR + " (missing 'challenge')"),
                 )
 
             if not isinstance(challenge, str) \
                     or len(challenge) > _CHALLENGE_MAX_LEN:
                 raise RequestPayloadValidationError(
-                    message=_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized challenge)',
+                    message=gettext(_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized challenge)'),
                 )
 
             return d_http.HttpResponse(challenge, content_type='text/plain')
 
         if call_type != 'event_callback':
             raise RequestPayloadValidationError(
-                message='unrecognized call type',
+                message=gettext('unrecognized call type'),
             )
 
         try:
@@ -197,7 +206,7 @@ def event_hook_handler(
                 or len(event_type) > _FIELD_MAX_LEN \
                 or event_type != 'emoji_changed':
             raise RequestPayloadValidationError(
-                message=_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event type)',
+                message=gettext(_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event type)'),
             )
 
         try:
@@ -208,21 +217,21 @@ def event_hook_handler(
             subhandler = _SUB_HANDLERS_BY_SUBTYPE[event_subtype]
         except (KeyError, ValueError):
             raise RequestPayloadValidationError(
-                message=_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event subtype)',
+                message=gettext(_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event subtype)'),
             )
 
         if not isinstance(team_id, str) \
                 or len(team_id) > TEAM_ID_MAX_LEN \
                 or not re.search(TEAM_ID_RE, team_id):
             raise RequestPayloadValidationError(
-                message=_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized team_id)',
+                message=gettext(_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized team_id)'),
             )
 
         team = SlackWorkspaceEmojiWatcher.objects.filter(team_id=team_id).first()
 
         if team is None:
             raise RequestPayloadValidationError(
-                message='no such team ({})'.format(team_id),
+                message=gettext('no such team ({})').format(team_id),
             )
 
         try:
@@ -231,13 +240,13 @@ def event_hook_handler(
         except slacker.Error as exc:
             if exc.args == ('invalid_auth',):
                 raise RequestPayloadValidationError(
-                    message='call to Slack API failed auth',
+                    message=gettext('call to Slack API failed auth'),
                     response=d_http.HttpResponseForbidden(),
                 )
 
             # Log, but otherwise ignore errors from our callbacks to Slack's
             # API
-            LOGGER.info('falled call to Slack')
+            LOGGER.info(gettext('falled call to Slack'))
             LOGGER.debug(_SHRUG, exc_info=True)
 
     except RequestPayloadValidationError as exc:
@@ -251,6 +260,19 @@ def event_hook_handler(
     return d_http.HttpResponse()
 
 # ========================================================================
+def _as_user():
+    # type: (...) -> typing.Optional[bool]
+    # as_user can only be non-None if it's a bot token (see
+    # <https://api.slack.com/docs/token-types>)
+    return False if re.search(r'\Axoxb-', SLACK_AUTH_TOKEN) else None
+
+# ========================================================================
+def _icon_emoji(
+        team,  # type: SlackWorkspaceEmojiWatcher
+):  # type: (...) -> typing.Optional[typing.Text]
+    return team.icon_emoji if team.icon_emoji else None
+
+# ========================================================================
 def _handle_add(
         team,  # type: SlackWorkspaceEmojiWatcher
         event,  # type: typing.Dict
@@ -262,13 +284,13 @@ def _handle_add(
             or not emoji_name \
             or len(emoji_name) > _EMOJI_NAME_MAX_LEN:
         raise RequestPayloadValidationError(
-            message=_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event name)',
+            message=gettext(_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event name)'),
         )
 
     if not isinstance(emoji_url, str) \
             or len(emoji_url) > _EMOJI_URL_MAX_LEN:
         raise RequestPayloadValidationError(
-            message=_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event value)',
+            message=gettext(_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event value)'),
         )
 
     if emoji_url:
@@ -277,14 +299,16 @@ def _handle_add(
                 'fallback': '<{}>'.format(emoji_url),
                 'image_url': emoji_url,
             },
-        ]  # type: typing.Optional[typing.List[typing.Dict]]
+        ]  # type: typing.Optional[typing.List[typing.Dict[typing.Text, typing.Text]]]
     else:
         attachments = None
 
-    return team.slack.chat.post_message(
+    return _SLACK.chat.post_message(
         team.channel_id,
-        html.escape('added `:{}:`').format(emoji_name),
+        html.escape(gettext('added `:{}:`').format(emoji_name)),
+        as_user=_as_user(),
         attachments=attachments,
+        icon_emoji=_icon_emoji(team),
     )
 
 # ========================================================================
@@ -296,7 +320,7 @@ def _handle_remove(
 
     if not isinstance(emoji_names, list):
         raise RequestPayloadValidationError(
-            message=_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event names)',
+            message=gettext(_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event names)'),
         )
 
     if not emoji_names:
@@ -308,12 +332,14 @@ def _handle_remove(
     if any((not isinstance(emoji_name, str) for emoji_name in emoji_names[:_EMOJIS_MAX_LEN])) \
             or any((len(emoji_name) > _EMOJI_NAME_MAX_LEN for emoji_name in emoji_names)):
         raise RequestPayloadValidationError(
-            message=_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event names)',
+            message=gettext(_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event names)'),
         )
 
-    return team.slack.chat.post_message(
+    return _SLACK.chat.post_message(
         team.channel_id,
-        html.escape('removed {}{}').format(', '.join('`:{}:`'.format(name) for name in emoji_names[:_EMOJIS_MAX_LEN]), '...' if too_many else ''),
+        html.escape(gettext('removed {}{}').format(', '.join('`:{}:`'.format(name) for name in emoji_names[:_EMOJIS_MAX_LEN]), '...' if too_many else '')),
+        as_user=_as_user(),
+        icon_emoji=_icon_emoji(team),
     )
 
 # ---- Initialization ----------------------------------------------------

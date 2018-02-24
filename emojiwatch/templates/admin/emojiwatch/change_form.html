@@ -1,0 +1,5 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+{% block after_field_sets %}<p>
+{% trans 'A watcher for receiving <a alt="emoji_changed event API documentation" href="https://api.slack.com/events/emoji_changed"><code>emoji_changed</code></a> events for a given team and posting updates to a given channel via <a alt="chat.postMessage API documentation" href="https://api.slack.com/methods/chat.postMessage"><code>chat.postMessage</code></a>.' %}
+</p>{% endblock %}

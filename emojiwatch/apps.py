@@ -24,19 +24,34 @@ install_aliases()
 
 # ---- Imports ---------------------------------------------------------
 
-import logging as _logging
+from gettext import gettext
 
-import django.conf as d_conf
+import django.apps as d_apps
 
-from .version import __version__  # noqa: F401
+from . import (
+    LOGGER,
+    SLACK_AUTH_TOKEN,
+    SLACK_VERIFICATION_TOKEN,
+)
 
-# ---- Data ------------------------------------------------------------
+# ---- Classes ---------------------------------------------------------
 
-__all__ = ()
+# ======================================================================
+class EmojiwatchConfig(d_apps.AppConfig):
 
-LOGGER = _logging.getLogger(__name__)
-SETTINGS = getattr(d_conf.settings, 'EMOJIWATCH', {})
-SLACK_AUTH_TOKEN = SETTINGS.get('slack_auth_token')
-SLACK_VERIFICATION_TOKEN = SETTINGS.get('slack_verification_token')
+    # ---- Data --------------------------------------------------------
 
-default_app_config = 'emojiwatch.apps.EmojiwatchConfig'
+    name = 'emojiwatch'
+    verbose_name = gettext('Emojiwatch')
+
+    # ---- Overrides ---------------------------------------------------
+
+    def ready(self):
+        # type: (...) -> None
+        super().ready()  # type: ignore # py2
+
+        if not SLACK_AUTH_TOKEN:
+            LOGGER.critical("EMOJIWATCH['slack_auth_token'] setting is missing")
+
+        if not SLACK_VERIFICATION_TOKEN:
+            LOGGER.critical("EMOJIWATCH['slack_verification_token'] setting is missing")

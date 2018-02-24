@@ -24,7 +24,6 @@ from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-n
 # ---- Imports -----------------------------------------------------------
 
 import fernet_fields
-import slacker
 
 from gettext import gettext
 
@@ -36,11 +35,12 @@ import django.db.models as d_d_models
 __all__ = ()
 
 CHANNEL_ID_MAX_LEN = 63
-CHANNEL_ID_RE = r'^C[0-9A-Z]*$'
+CHANNEL_ID_RE = r'\AC[0-9A-Z]+\Z'
+ICON_EMOJI_DEFAULT = ':robot_face:'
+ICON_EMOJI_MAX_LEN = 255
+ICON_EMOJI_RE = r'\A:[\w-]+:\Z'
 TEAM_ID_MAX_LEN = 63
-TEAM_ID_RE = r'^T[0-9A-Z]*$'
-WORKSPACE_TOKEN_MAX_LEN = 255
-WORKSPACE_TOKEN_RE = r'^xoxa-([0-9A-Fa-f]+)+'
+TEAM_ID_RE = r'\AT[0-9A-Z]+\Z'
 
 # ---- Exceptions --------------------------------------------------------
 
@@ -96,7 +96,7 @@ class VersionedModel(d_d_models.Model):
         updated = filtered._update(values)  # pylint: disable=protected-access
 
         if updated == 0:
-            raise StaleVersionError('{!r}._version {} is stale'.format(self, self._version - 1))
+            raise StaleVersionError(gettext('{!r}._version {} is stale').format(self, self._version - 1))
 
         assert updated == 1
 
@@ -116,6 +116,7 @@ class SlackWorkspaceEmojiWatcher(VersionedModel):
     # ---- Properties ----------------------------------------------------
 
     team_id = d_d_models.CharField(
+        default='T',
         max_length=TEAM_ID_MAX_LEN,
         null=False,
         unique=True,
@@ -127,16 +128,8 @@ class SlackWorkspaceEmojiWatcher(VersionedModel):
 
     team_id.short_description = gettext('Team ID (e.g., T123ABC...)')
 
-    workspace_token = fernet_fields.EncryptedCharField(
-        max_length=WORKSPACE_TOKEN_MAX_LEN,
-        null=False,
-        validators=[
-            d_c_validators.RegexValidator(WORKSPACE_TOKEN_RE, message=gettext('Must be of the format (e.g.) xoxa-1f2e3d-4c5b6a...')),
-        ],
-        verbose_name=gettext('Workspace Token'),
-    )
-
     channel_id = d_d_models.CharField(
+        default='C',
         max_length=CHANNEL_ID_MAX_LEN,
         null=False,
         validators=[
@@ -145,12 +138,22 @@ class SlackWorkspaceEmojiWatcher(VersionedModel):
         verbose_name=gettext('Channel ID'),
     )
 
+    channel_id.short_description = gettext('Channel ID (e.g., C123ABC...)')
+
+    icon_emoji = d_d_models.CharField(
+        default=ICON_EMOJI_DEFAULT,
+        max_length=ICON_EMOJI_MAX_LEN,
+        null=False,
+        validators=[
+            d_c_validators.RegexValidator(ICON_EMOJI_RE, message=gettext('Must be of the format (e.g.) :emoji_name:...')),
+        ],
+        verbose_name=gettext('Icon Emoji'),
+    )
+
+    icon_emoji.short_description = gettext('Icon Emoji (e.g., {}...)').format(ICON_EMOJI_DEFAULT)
+
     notes = fernet_fields.EncryptedTextField(
         blank=True,
         default='',
         verbose_name=gettext('Notes'),
     )
-
-    @property
-    def slack(self):
-        return slacker.Slacker(self.workspace_token)
