@@ -59,11 +59,13 @@ class SlackWorkspaceEmojiWatcherTestCase(d_test.TestCase):
 
         for field in (
                 'team_id',
+                'access_token',
                 'channel_id',
         ):
             self.assertRegex(cm.exception.message_dict[field][0], r'\AMust be of the format \(e\.g\.\) ', msg='(field = {!r})'.format(field))
 
         ws_emoji_watcher.team_id = ''
+        ws_emoji_watcher.access_token = ''
         ws_emoji_watcher.channel_id = ''
 
         with self.assertRaises(d_c_exceptions.ValidationError) as cm:
@@ -71,11 +73,13 @@ class SlackWorkspaceEmojiWatcherTestCase(d_test.TestCase):
 
         for field in (
                 'team_id',
+                'access_token',
                 'channel_id',
         ):
             self.assertEqual(cm.exception.message_dict[field][0], 'This field cannot be blank.', msg='(field = {!r})'.format(field))
 
         ws_emoji_watcher.team_id = '...'
+        ws_emoji_watcher.access_token = '...'
         ws_emoji_watcher.channel_id = '...'
         ws_emoji_watcher.icon_emoji = '...'
 
@@ -84,6 +88,7 @@ class SlackWorkspaceEmojiWatcherTestCase(d_test.TestCase):
 
         for field, field_fmt in (
                 ('team_id', 'T123ABC'),
+                ('access_token', 'xoxa-1f2e3d-4c5b6a'),
                 ('channel_id', 'C123ABC'),
                 ('icon_emoji', ':emoji_name:'),
         ):
@@ -93,6 +98,7 @@ class SlackWorkspaceEmojiWatcherTestCase(d_test.TestCase):
     def test_create(self):
         ws_emoji_watcher1 = SlackWorkspaceEmojiWatcher()
         ws_emoji_watcher1.team_id = 'T123ABC'
+        ws_emoji_watcher1.access_token = 'xoxa-1f2e3d-4c5b6a'
         ws_emoji_watcher1.channel_id = 'C123ABC'
         ws_emoji_watcher1.icon_emoji = ':blush:'
         self.assertLess(ws_emoji_watcher1._version, 0)  # pylint: disable=protected-access
@@ -107,6 +113,7 @@ class SlackWorkspaceEmojiWatcherTestCase(d_test.TestCase):
 
         ws_emoji_watcher2 = SlackWorkspaceEmojiWatcher()
         ws_emoji_watcher2.team_id = 'T456DEF'
+        ws_emoji_watcher2.access_token = 'xoxa-4c5b6a-1f2e3d'
         ws_emoji_watcher2.channel_id = 'C456DEF'
         ws_emoji_watcher2.icon_emoji = ':smirk:'
         self.assertLess(ws_emoji_watcher2._version, 0)  # pylint: disable=protected-access
@@ -122,12 +129,14 @@ class SlackWorkspaceEmojiWatcherTestCase(d_test.TestCase):
     def test_team_id_uniqueness(self):
         ws_emoji_watcher1 = SlackWorkspaceEmojiWatcher()
         ws_emoji_watcher1.team_id = 'T123ABC'
+        ws_emoji_watcher1.access_token = 'xoxa-1f2e3d-4c5b6a'
         ws_emoji_watcher1.channel_id = 'C123ABC'
         ws_emoji_watcher1.icon_emoji = ':blush:'
         ws_emoji_watcher1.save()
 
         ws_emoji_watcher2 = SlackWorkspaceEmojiWatcher()
         ws_emoji_watcher2.team_id = ws_emoji_watcher1.team_id
+        ws_emoji_watcher2.access_token = 'xoxa-4c5b6a-1f2e3d'
         ws_emoji_watcher2.channel_id = 'C456DEF'
         ws_emoji_watcher2.icon_emoji = ':smirk:'
         self.assertLess(ws_emoji_watcher2._version, 0)  # pylint: disable=protected-access
@@ -141,6 +150,7 @@ class SlackWorkspaceEmojiWatcherTestCase(d_test.TestCase):
     def test_version_staleness(self):
         ws_emoji_watcher1 = SlackWorkspaceEmojiWatcher()
         ws_emoji_watcher1.team_id = 'T123ABC'
+        ws_emoji_watcher1.access_token = 'xoxa-1f2e3d-4c5b6a'
         ws_emoji_watcher1.channel_id = 'C123ABC'
         ws_emoji_watcher1.icon_emoji = ':blush:'
         ws_emoji_watcher1.save()

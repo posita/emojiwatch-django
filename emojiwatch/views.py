@@ -38,7 +38,6 @@ from gettext import gettext
 
 from . import (
     LOGGER,
-    SLACK_AUTH_TOKEN,
     SLACK_VERIFICATION_TOKEN,
 )
 from .models import (
@@ -57,14 +56,13 @@ _EMOJI_URL_MAX_LEN = 1023
 _EMOJIS_MAX_LEN = 32
 _FIELD_MAX_LEN = 63
 _SHRUG = str(u'\u00af\\_(\u30c4)_/\u00af')
-_SLACK = slacker.Slacker(SLACK_AUTH_TOKEN)
 _SUB_HANDLERS_BY_SUBTYPE = {}  # type: typing.Dict[typing.Text, typing.Callable[[SlackWorkspaceEmojiWatcher, typing.Dict], slacker.Response]]
 _UNRECOGNIZED_JSON_BODY_ERR = 'unrecognized JSON structure from request body'
 
 # ---- Exceptions --------------------------------------------------------
 
 try:
-    from json.decoder import JSONDecodeError
+    from json.decoder import JSONDecodeError  # type: ignore # py2
 except ImportError:
     JSONDecodeError = ValueError  # type: ignore # py2
 
@@ -116,11 +114,6 @@ class CsrfExemptRedirectView(d_v_generic.RedirectView):
 def event_hook_handler(
         request,  # type: d_http.HttpRequest
 ):  # type: (...) -> d_http.HttpResponse
-    if not SLACK_AUTH_TOKEN:
-        LOGGER.critical("EMOJIWATCH['slack_auth_token'] setting is missing")
-
-        return d_http.HttpResponseServerError()
-
     if not SLACK_VERIFICATION_TOKEN:
         LOGGER.critical("EMOJIWATCH['slack_verification_token'] setting is missing")
 
@@ -260,11 +253,12 @@ def event_hook_handler(
     return d_http.HttpResponse()
 
 # ========================================================================
-def _as_user():
-    # type: (...) -> typing.Optional[bool]
+def _as_user(
+        team,  # type: SlackWorkspaceEmojiWatcher
+):  # type: (...) -> typing.Optional[bool]
     # as_user can only be non-None if it's a bot token (see
     # <https://api.slack.com/docs/token-types>)
-    return False if re.search(r'\Axoxb-', SLACK_AUTH_TOKEN) else None
+    return False if re.search(r'\Axoxb-', team.access_token) else None
 
 # ========================================================================
 def _icon_emoji(
@@ -303,10 +297,10 @@ def _handle_add(
     else:
         attachments = None
 
-    return _SLACK.chat.post_message(
+    return slacker.Slacker(team.access_token).chat.post_message(
         team.channel_id,
         html.escape(gettext('added `:{}:`').format(emoji_name)),
-        as_user=_as_user(),
+        as_user=_as_user(team),
         attachments=attachments,
         icon_emoji=_icon_emoji(team),
     )
@@ -335,10 +329,10 @@ def _handle_remove(
             message=gettext(_UNRECOGNIZED_JSON_BODY_ERR + ' (unrecognized event names)'),
         )
 
-    return _SLACK.chat.post_message(
+    return slacker.Slacker(team.access_token).chat.post_message(
         team.channel_id,
         html.escape(gettext('removed {}{}').format(', '.join('`:{}:`'.format(name) for name in emoji_names[:_EMOJIS_MAX_LEN]), '...' if too_many else '')),
-        as_user=_as_user(),
+        as_user=_as_user(team),
         icon_emoji=_icon_emoji(team),
     )
 

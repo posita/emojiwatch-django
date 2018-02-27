@@ -36,7 +36,6 @@ __all__ = ()
 
 LOGGER = _logging.getLogger(__name__)
 SETTINGS = getattr(d_conf.settings, 'EMOJIWATCH', {})
-SLACK_AUTH_TOKEN = SETTINGS.get('slack_auth_token')
 SLACK_VERIFICATION_TOKEN = SETTINGS.get('slack_verification_token')
 
 default_app_config = 'emojiwatch.apps.EmojiwatchConfig'
