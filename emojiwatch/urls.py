@@ -44,9 +44,9 @@ _RTD_URL = 'https://django-emojiwatch.readthedocs.io/en/{}/'.format(_RTD_RELEASE
 app_name = 'emojiwatch'
 
 urlpatterns = (
-    d_c_urls.url(r'event_hook$', event_hook_handler, name='event_hook'),
-    d_c_urls.url(r'', CsrfExemptRedirectView.as_view(
-        permanent=True,
+    d_c_urls.url(r'^event_hook$', event_hook_handler, name='event_hook'),
+    d_c_urls.url(r'^$', CsrfExemptRedirectView.as_view(
+        permanent=False,
         url=_RTD_URL,
     )),
 )

@@ -34,6 +34,8 @@ import django.db.models as d_d_models
 
 __all__ = ()
 
+ACCESS_TOKEN_MAX_LEN = 255
+ACCESS_TOKEN_RE = r'^xox[abp](-[0-9A-Fa-f]+)+'
 CHANNEL_ID_MAX_LEN = 63
 CHANNEL_ID_RE = r'\AC[0-9A-Z]+\Z'
 ICON_EMOJI_DEFAULT = ':robot_face:'
@@ -126,7 +128,19 @@ class SlackWorkspaceEmojiWatcher(VersionedModel):
         verbose_name=gettext('Team ID'),
     )
 
-    team_id.short_description = gettext('Team ID (e.g., T123ABC...)')
+    team_id.short_description = gettext('Slack Team ID (e.g., T123ABC...)')
+
+    access_token = fernet_fields.EncryptedCharField(
+        default='xoxa-',
+        max_length=ACCESS_TOKEN_MAX_LEN,
+        null=False,
+        validators=[
+            d_c_validators.RegexValidator(ACCESS_TOKEN_RE, message=gettext('Must be of the format (e.g.) xoxa-1f2e3d-4c5b6a...')),
+        ],
+        verbose_name=gettext('Access Token'),
+    )
+
+    access_token.short_description = gettext('Slack OAuth access token (e.g., xoxa-1f2e3d-4c5b6a...)')
 
     channel_id = d_d_models.CharField(
         default='C',
@@ -138,7 +152,7 @@ class SlackWorkspaceEmojiWatcher(VersionedModel):
         verbose_name=gettext('Channel ID'),
     )
 
-    channel_id.short_description = gettext('Channel ID (e.g., C123ABC...)')
+    channel_id.short_description = gettext('Slack Channel ID (e.g., C123ABC...)')
 
     icon_emoji = d_d_models.CharField(
         default=ICON_EMOJI_DEFAULT,
@@ -155,5 +169,6 @@ class SlackWorkspaceEmojiWatcher(VersionedModel):
     notes = fernet_fields.EncryptedTextField(
         blank=True,
         default='',
-        verbose_name=gettext('Notes'),
     )
+
+    notes.short_description = gettext('Your Notes (not transmitted)').format(ICON_EMOJI_DEFAULT)

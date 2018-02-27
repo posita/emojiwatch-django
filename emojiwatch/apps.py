@@ -30,7 +30,6 @@ import django.apps as d_apps
 
 from . import (
     LOGGER,
-    SLACK_AUTH_TOKEN,
     SLACK_VERIFICATION_TOKEN,
 )
 
@@ -49,9 +48,6 @@ class EmojiwatchConfig(d_apps.AppConfig):
     def ready(self):
         # type: (...) -> None
         super().ready()  # type: ignore # py2
-
-        if not SLACK_AUTH_TOKEN:
-            LOGGER.critical("EMOJIWATCH['slack_auth_token'] setting is missing")
 
         if not SLACK_VERIFICATION_TOKEN:
             LOGGER.critical("EMOJIWATCH['slack_verification_token'] setting is missing")

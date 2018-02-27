@@ -24,6 +24,7 @@ from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-n
 # ---- Imports -----------------------------------------------------------
 
 import logging
+import os
 
 # ---- Data --------------------------------------------------------------
 
@@ -45,8 +46,7 @@ DATABASES = {
 DEBUG = True
 
 EMOJIWATCH = {
-    'slack_auth_token': 'xoxa-for-testing-only-not-a-real-auth-token',
-    'slack_verification_token': 'FoRtEsTiNgOnLyNoTaReAlVeRiFiCaTiOnToKeN',
+    'slack_verification_token': os.environ.get('EMOJIWATCH_SLACK_VERIFICATION_TOKEN', 'FoRtEsTiNgOnLyNoTaReAlVeRiFiCaTiOnToKeN'),
 }
 
 INSTALLED_APPS = (
@@ -64,11 +64,13 @@ LANGUAGE_CODE = 'en-us'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+
     'formatters': {
         'standard': {
             'format': '%(asctime)s\t%(levelname)s\t%(name)s\t%(filename)s:%(lineno)d\t%(message)s',
         },
     },
+
     'handlers': {
         'default': {
             'class': 'logging.StreamHandler',
@@ -76,12 +78,14 @@ LOGGING = {
             'formatter': 'standard',
         },
     },
+
     'loggers': {
         '': {
             'handlers': [],  # ['default'],
             'level': 'DEBUG',
             'propagate': False,
         },
+
         'django': {
             'level': 'INFO',
             'propagate': True,

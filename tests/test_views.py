@@ -26,7 +26,6 @@ from future.builtins.disabled import *  # noqa: F401,F403 # pylint: disable=no-n
 
 import json
 import slacker
-import re
 import unittest
 
 try:
@@ -41,12 +40,7 @@ if __name__ == '__main__':
     import tests
     tests.setup()
 
-import emojiwatch.views
-
-from emojiwatch import (
-    SLACK_AUTH_TOKEN,
-    SLACK_VERIFICATION_TOKEN,
-)
+from emojiwatch import SLACK_VERIFICATION_TOKEN
 from emojiwatch.models import (
     SlackWorkspaceEmojiWatcher,
     TEAM_ID_MAX_LEN,
@@ -116,11 +110,17 @@ class EventHandlerTestCaseBase(d_test.TestCase):
 
     WORKSPACE = {
         'team_id': 'T123ABC',
+        'access_token': 'xoxa-1f2e3d-4c5b6a',
         'channel_id': 'C123ABC',
         'icon_emoji': ':blush:',
     }
 
-    BOT_AUTH_TOKEN = re.sub(r'\Axox.-', 'xoxb-', SLACK_AUTH_TOKEN)
+    BOT = {
+        'team_id': 'T456DEF',
+        'access_token': 'xoxb-4c5b6a-1f2e3d',
+        'channel_id': 'C456DEF',
+        'icon_emoji': ':smirk:',
+    }
 
     # ---- Properties ----------------------------------------------------
 
@@ -174,6 +174,7 @@ class EventHandlerTestCaseBase(d_test.TestCase):
     def setUp(self):
         super().setUp()  # type: ignore # py2
         SlackWorkspaceEmojiWatcher(**self.WORKSPACE).save()
+        SlackWorkspaceEmojiWatcher(**self.BOT).save()
 
     # ---- Methods -------------------------------------------------------
 
@@ -458,12 +459,12 @@ class EmojiAddTestCase(EventHandlerTestCaseBase):
     ):
         # type: (...) -> None
         good_add_event = self.good_add_event
-        res = self._post_good_add_event(good_add_event, mocked_post_message)
+        res = self._post_add_event(self.WORKSPACE, good_add_event, mocked_post_message)
         self.assertEqual(res.status_code, 200)
 
-        with mock.patch.object(emojiwatch.views, 'SLACK_AUTH_TOKEN', self.BOT_AUTH_TOKEN):
-            res = self._post_good_add_event(good_add_event, mocked_post_message, as_user=False)
-            self.assertEqual(res.status_code, 200)
+        good_add_event['team_id'] = self.BOT['team_id']
+        res = self._post_add_event(self.BOT, good_add_event, mocked_post_message, as_user=False)
+        self.assertEqual(res.status_code, 200)
 
     @mock.patch.object(slacker.Chat, 'post_message')
     def test_event_add_emoji_invalid_auth(
@@ -472,7 +473,7 @@ class EmojiAddTestCase(EventHandlerTestCaseBase):
     ):
         # type: (...) -> None
         mocked_post_message.side_effect = slacker.Error('invalid_auth')
-        res = self._post_good_add_event(self.good_add_event, mocked_post_message)
+        res = self._post_add_event(self.WORKSPACE, self.good_add_event, mocked_post_message)
         self.assertEqual(res.status_code, 403)
 
     @mock.patch.object(slacker.Chat, 'post_message')
@@ -482,28 +483,30 @@ class EmojiAddTestCase(EventHandlerTestCaseBase):
     ):
         # type: (...) -> None
         mocked_post_message.side_effect = slacker.Error()
-        res = self._post_good_add_event(self.good_add_event, mocked_post_message)
+        res = self._post_add_event(self.WORKSPACE, self.good_add_event, mocked_post_message)
         self.assertEqual(res.status_code, 200)
 
-    def _post_good_add_event(
+    def _post_add_event(
             self,
-            good_add_event,  # type: typing.Dict
+            team_dict,  # type: typing.Dict
+            add_event,  # type: typing.Dict
             mocked_post_message,  # type: mock.MagicMock
             as_user=None,  # type: typing.Optional[bool]
     ):
         # type: (...) -> d_http.Response
-        emoji_name = good_add_event['event']['name']
-        emoji_url = good_add_event['event']['value']
-        res = self.post_event_hook(good_add_event)
+        add_event.setdefault('team_id', team_dict['team_id'])
+        emoji_name = add_event['event']['name']
+        emoji_url = add_event['event']['value']
+        res = self.post_event_hook(add_event)
         mocked_post_message.assert_called_with(
-            self.WORKSPACE['channel_id'],
+            team_dict['channel_id'],
             'added `:{}:`'.format(emoji_name),
             attachments=[{
                 'fallback': '<{}>'.format(emoji_url),
                 'image_url': emoji_url,
             }],
             as_user=as_user,
-            icon_emoji=self.WORKSPACE['icon_emoji'],
+            icon_emoji=team_dict['icon_emoji'],
         )
 
         return res
@@ -520,12 +523,12 @@ class EmojiRemoveTestCase(EventHandlerTestCaseBase):
     ):
         # type: (...) -> None
         good_remove_event = self.good_remove_event
-        res = self._post_good_remove_event(good_remove_event, mocked_post_message)
+        res = self._post_remove_event(self.WORKSPACE, good_remove_event, mocked_post_message)
         self.assertEqual(res.status_code, 200)
 
-        with mock.patch.object(emojiwatch.views, 'SLACK_AUTH_TOKEN', self.BOT_AUTH_TOKEN):
-            res = self._post_good_remove_event(good_remove_event, mocked_post_message, as_user=False)
-            self.assertEqual(res.status_code, 200)
+        good_remove_event['team_id'] = self.BOT['team_id']
+        res = self._post_remove_event(self.BOT, good_remove_event, mocked_post_message, as_user=False)
+        self.assertEqual(res.status_code, 200)
 
     @mock.patch.object(slacker.Chat, 'post_message')
     def test_event_remove_emoji_invalid_auth(
@@ -534,7 +537,7 @@ class EmojiRemoveTestCase(EventHandlerTestCaseBase):
     ):
         # type: (...) -> None
         mocked_post_message.side_effect = slacker.Error('invalid_auth')
-        res = self._post_good_remove_event(self.good_remove_event, mocked_post_message)
+        res = self._post_remove_event(self.WORKSPACE, self.good_remove_event, mocked_post_message)
         self.assertEqual(res.status_code, 403)
 
     @mock.patch.object(slacker.Chat, 'post_message')
@@ -544,23 +547,25 @@ class EmojiRemoveTestCase(EventHandlerTestCaseBase):
     ):
         # type: (...) -> None
         mocked_post_message.side_effect = slacker.Error()
-        res = self._post_good_remove_event(self.good_remove_event, mocked_post_message)
+        res = self._post_remove_event(self.WORKSPACE, self.good_remove_event, mocked_post_message)
         self.assertEqual(res.status_code, 200)
 
-    def _post_good_remove_event(
+    def _post_remove_event(
             self,
-            good_remove_event,  # type: typing.Dict
+            team_dict,  # type: typing.Dict
+            remove_event,  # type: typing.Dict
             mocked_post_message,  # type: mock.MagicMock
             as_user=None,  # type: typing.Optional[bool]
     ):
         # type: (...) -> d_http.Response
-        emoji_names = good_remove_event['event']['names']
-        res = self.post_event_hook(good_remove_event)
+        remove_event.setdefault('team_id', team_dict['team_id'])
+        emoji_names = remove_event['event']['names']
+        res = self.post_event_hook(remove_event)
         mocked_post_message.assert_called_with(
-            self.WORKSPACE['channel_id'],
+            team_dict['channel_id'],
             'removed `:{}:`'.format(':`, `:'.join(emoji_names)),
             as_user=as_user,
-            icon_emoji=self.WORKSPACE['icon_emoji'],
+            icon_emoji=team_dict['icon_emoji'],
         )
 
         return res
