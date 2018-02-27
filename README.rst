@@ -17,9 +17,9 @@ All rights not expressly waived or licensed are reserved.
 If those files are missing or appear to be modified from their originals, then please contact the author before viewing or using this software in any capacity.
 
 .. |LICENSE| replace:: ``LICENSE``
-.. _`LICENSE`: https://_skel.readthedocs.org/en/master/LICENSE.html
+.. _`LICENSE`: https://django-emojiwatch.readthedocs.org/en/master/LICENSE.html
 .. |CREDITS| replace:: ``CREDITS``
-.. _`CREDITS`: https://_skel.readthedocs.org/en/master/CREDITS.html
+.. _`CREDITS`: https://django-emojiwatch.readthedocs.org/en/master/CREDITS.html
 
 .. image:: https://travis-ci.org/posita/django-emojiwatch.svg?branch=master
    :target: https://travis-ci.org/posita/django-emojiwatch?branch=master
@@ -73,7 +73,7 @@ See `the docs <https://django-emojiwatch.readthedocs.org/en/master/>`__ for more
 Use
 ---
 
-See `the introduction <docs/intro.rst>`__.
+See `the introduction <https://django-emojiwatch.readthedocs.io/en/master/intro.html>`__.
 
 Issues
 ------
