@@ -17,16 +17,16 @@ All rights not expressly waived or licensed are reserved.
 If those files are missing or appear to be modified from their originals, then please contact the author before viewing or using this software in any capacity.
 
 .. |LICENSE| replace:: ``LICENSE``
-.. _`LICENSE`: https://django-emojiwatch.readthedocs.org/en/master/LICENSE.html
+.. _`LICENSE`: https://django-emojiwatch.readthedocs.org/en/v0.0.8/LICENSE.html
 .. |CREDITS| replace:: ``CREDITS``
-.. _`CREDITS`: https://django-emojiwatch.readthedocs.org/en/master/CREDITS.html
+.. _`CREDITS`: https://django-emojiwatch.readthedocs.org/en/v0.0.8/CREDITS.html
 
-.. image:: https://travis-ci.org/posita/django-emojiwatch.svg?branch=master
-   :target: https://travis-ci.org/posita/django-emojiwatch?branch=master
+.. image:: https://travis-ci.org/posita/django-emojiwatch.svg?branch=v0.0.8
+   :target: https://travis-ci.org/posita/django-emojiwatch?branch=v0.0.8
    :alt: [Build Status]
 
-.. image:: https://coveralls.io/repos/posita/django-emojiwatch/badge.svg?branch=master
-   :target: https://coveralls.io/r/posita/django-emojiwatch?branch=master
+.. image:: https://coveralls.io/repos/posita/django-emojiwatch/badge.svg?branch=v0.0.8
+   :target: https://coveralls.io/r/posita/django-emojiwatch?branch=v0.0.8
    :alt: [Coverage Status]
 
 Curious about integrating your project with the above services?
@@ -38,29 +38,29 @@ Jeff Knupp (|@jeffknupp|_) `describes how <https://www.jeffknupp.com/blog/2013/0
 ``django-emojiwatch``
 =====================
 
-.. image:: https://img.shields.io/pypi/v/django-emojiwatch.svg
+.. image:: https://img.shields.io/pypi/v/django-emojiwatch/0.0.8.svg
    :target: https://pypi.python.org/pypi/django-emojiwatch
-   :alt: [master Version]
+   :alt: [v0.0.8 Version]
 
-.. image:: https://readthedocs.org/projects/django-emojiwatch/badge/?version=master
-   :target: https://django-emojiwatch.readthedocs.org/en/master/
-   :alt: [master Documentation]
+.. image:: https://readthedocs.org/projects/django-emojiwatch/badge/?version=v0.0.8
+   :target: https://django-emojiwatch.readthedocs.org/en/v0.0.8/
+   :alt: [v0.0.8 Documentation]
 
-.. image:: https://img.shields.io/pypi/l/django-emojiwatch.svg
+.. image:: https://img.shields.io/pypi/l/django-emojiwatch/0.0.8.svg
    :target: http://opensource.org/licenses/MIT
-   :alt: [master License]
+   :alt: [v0.0.8 License]
 
-.. image:: https://img.shields.io/pypi/pyversions/django-emojiwatch.svg
+.. image:: https://img.shields.io/pypi/pyversions/django-emojiwatch/0.0.8.svg
    :target: https://pypi.python.org/pypi/django-emojiwatch
-   :alt: [master Supported Python Versions]
+   :alt: [v0.0.8 Supported Python Versions]
 
-.. image:: https://img.shields.io/pypi/implementation/django-emojiwatch.svg
+.. image:: https://img.shields.io/pypi/implementation/django-emojiwatch/0.0.8.svg
    :target: https://pypi.python.org/pypi/django-emojiwatch
-   :alt: [master Supported Python Implementations]
+   :alt: [v0.0.8 Supported Python Implementations]
 
-.. image:: https://img.shields.io/pypi/status/django-emojiwatch.svg
+.. image:: https://img.shields.io/pypi/status/django-emojiwatch/0.0.8.svg
    :target: https://pypi.python.org/pypi/django-emojiwatch
-   :alt: [master Development Stage]
+   :alt: [v0.0.8 Development Stage]
 
 ..
 
@@ -68,12 +68,12 @@ Jeff Knupp (|@jeffknupp|_) `describes how <https://www.jeffknupp.com/blog/2013/0
 It is licensed under the `MIT License <https://opensource.org/licenses/MIT>`_.
 See the |LICENSE|_ file for details.
 Source code is `available on GitHub <https://github.com/posita/django-emojiwatch>`__.
-See `the docs <https://django-emojiwatch.readthedocs.org/en/master/>`__ for more information.
+See `the docs <https://django-emojiwatch.readthedocs.org/en/v0.0.8/>`__ for more information.
 
 Use
 ---
 
-See `the introduction <https://django-emojiwatch.readthedocs.io/en/master/intro.html>`__.
+See `the introduction <https://django-emojiwatch.readthedocs.io/en/v0.0.8/intro.html>`__.
 
 Issues
 ------
